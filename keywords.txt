@@ -1,0 +1,31 @@
+#######################################
+# Syntax Coloring Map for Bench
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+Bench	KEYWORD1
+BenchChannel	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin	KEYWORD2
+loop	KEYWORD2
+number	KEYWORD2
+boolean	KEYWORD2
+unit	KEYWORD2
+range	KEYWORD2
+precision	KEYWORD2
+readOnly	KEYWORD2
+writeOnly	KEYWORD2
+label	KEYWORD2
+log	KEYWORD2
+warn	KEYWORD2
+error	KEYWORD2
+hasClients	KEYWORD2
+setUpdateInterval	KEYWORD2
+setRefreshInterval	KEYWORD2
