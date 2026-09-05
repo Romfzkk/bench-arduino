@@ -54,6 +54,16 @@ lib_deps =
   bblanchon/ArduinoJson@^7.0.0
 ```
 
+## Examples
+
+| Sketch | Boards | What it shows |
+| --- | --- | --- |
+| `Minimal` | ESP32, ESP8266 | One sensor, one relay. Start here. |
+| `Greenhouse` | ESP32 | Four sensors, PWM fan, grow light, momentary pump |
+
+Both are compiled against ESP32 core 3.3.7 and ESP8266 core 3.1.2 before
+every release.
+
 ## API
 
 ### Registering variables

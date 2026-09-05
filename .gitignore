@@ -1,5 +1,5 @@
-# Build artefacts
-*.zip
+dist/
+Bench.zip
 build/
 .pio/
 .vscode/
