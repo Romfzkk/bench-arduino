@@ -49,7 +49,7 @@ PlatformIO:
 
 ```ini
 lib_deps =
-  https://github.com/romfzkk/bench-arduino.git
+  https://github.com/Romfzkk/bench-arduino.git
   links2004/WebSockets
   bblanchon/ArduinoJson@^7.0.0
 ```
