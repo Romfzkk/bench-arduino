@@ -1,6 +1,6 @@
 {
   "name": "Bench",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Build a phone control panel for your ESP32 or Arduino with no cloud in the middle. Register the variables you care about and the Bench mobile app discovers them over a plain WebSocket on your own network.",
   "keywords": "esp32, esp8266, websocket, dashboard, control panel, iot, mdns",
   "authors": [

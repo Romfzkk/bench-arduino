@@ -14,7 +14,7 @@
 #define BENCH_MAX_CHANNELS 24
 #endif
 
-#define BENCH_VERSION "1.0.0"
+#define BENCH_VERSION "1.0.1"
 #define BENCH_PROTOCOL 1
 
 class WebSocketsServer;
