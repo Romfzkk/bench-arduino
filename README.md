@@ -1,7 +1,5 @@
 # Bench
 
-[![Compile examples](https://github.com/Romfzkk/bench-arduino/actions/workflows/compile.yml/badge.svg)](https://github.com/Romfzkk/bench-arduino/actions/workflows/compile.yml)
-
 Put your ESP32 project on your phone without wiring a screen to it.
 
 You name the variables you care about, the app reads that list and builds an
@@ -84,7 +82,8 @@ Use it when something is wrong and you want to know which half is broken.
 ESP32 only, because it uses `ledcAttach`.
 
 All three are compiled against ESP32 core 3.3.7 and ESP8266 core 3.1.2 before
-every release.
+every release. There is a workflow in `.github/` that does this on every push
+once GitHub Actions is enabled on the account.
 
 ## Registering variables
 
