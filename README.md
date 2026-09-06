@@ -1,5 +1,7 @@
 # Bench
 
+[![Compile examples](https://github.com/Romfzkk/bench-arduino/actions/workflows/compile.yml/badge.svg)](https://github.com/Romfzkk/bench-arduino/actions/workflows/compile.yml)
+
 Put your ESP32 project on your phone without wiring a screen to it.
 
 You name the variables you care about, the app reads that list and builds an
@@ -38,7 +40,19 @@ That is the whole thing. You never describe a variable twice.
 **New to this? Start with [GETTING-STARTED.md](GETTING-STARTED.md).** It goes
 from a bare board to a working panel in about ten minutes.
 
-## Install
+## The app
+
+The library is half of this. The other half is the Android app that reads what
+your board reports and builds the interface.
+
+Both are on the [releases page](../../releases/latest): `bench.apk` for the
+phone, `Bench.zip` for the Arduino IDE.
+
+The APK is not on Google Play yet, so Android will warn you about installing
+from an unknown source. That is the warning for any sideloaded app, not a
+judgement about this one.
+
+## Install the library
 
 Not in the Library Manager yet, so grab
 [Bench.zip from the releases page](../../releases/latest) and use
@@ -181,6 +195,12 @@ App to board:
 app cannot parse is dropped rather than treated as an error, so a half
 implemented board still works.
 
+## Repository layout
+
+`src/` is the library. `examples/` are the sketches. `docs/` holds the privacy
+policy and terms for the app, hosted from here because GitHub Pages needs a
+public repo. `tools/make-zip.mjs` packages a release.
+
 ## Licence
 
-MIT, see [LICENSE](LICENSE).
+MIT, see [LICENSE](LICENSE). Changes are in [CHANGELOG.md](CHANGELOG.md).

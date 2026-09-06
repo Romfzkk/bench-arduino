@@ -5,7 +5,7 @@
  * Library" is how people install it. This produces that ZIP, and it is also
  * the file to attach to a GitHub release.
  *
- * Run: node make-zip.mjs
+ * Run: node tools/make-zip.mjs
  */
 
 import { createWriteStream, mkdirSync, readdirSync, readFileSync, statSync } from 'node:fs'
@@ -13,13 +13,13 @@ import { deflateRawSync, crc32 } from 'node:zlib'
 import { dirname, join, relative, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-const ROOT = dirname(fileURLToPath(import.meta.url))
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
 const LIB_DIR = ROOT
 const OUT_DIR = join(ROOT, 'dist')
 
 /** Every file under a directory, depth first, as absolute paths. */
-const SKIP = new Set(['.git', '.github', 'dist', 'docs', 'node_modules'])
-const SKIP_FILES = new Set(['make-zip.mjs', '.gitignore', 'Bench.zip'])
+const SKIP = new Set(['.git', '.github', 'dist', 'docs', 'tools', 'node_modules'])
+const SKIP_FILES = new Set(['.gitignore', 'Bench.zip', 'CHANGELOG.md'])
 
 function walk(dir) {
   const out = []

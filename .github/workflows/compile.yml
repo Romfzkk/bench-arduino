@@ -1,0 +1,52 @@
+name: Compile examples
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  compile:
+    name: ${{ matrix.board.name }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        board:
+          - name: ESP32
+            fqbn: esp32:esp32:esp32
+            platform: esp32:esp32
+            url: https://espressif.github.io/arduino-esp32/package_esp32_index.json
+            # Greenhouse uses ledcAttach, which is ESP32 only.
+            sketches: |
+              - examples/Minimal
+              - examples/SelfTest
+              - examples/Greenhouse
+
+          - name: ESP8266
+            fqbn: esp8266:esp8266:nodemcuv2
+            platform: esp8266:esp8266
+            url: https://arduino.esp8266.com/stable/package_esp8266com_index.json
+            sketches: |
+              - examples/Minimal
+              - examples/SelfTest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compile
+        uses: arduino/compile-sketches@v1
+        with:
+          fqbn: ${{ matrix.board.fqbn }}
+          platforms: |
+            - name: ${{ matrix.board.platform }}
+              source-url: ${{ matrix.board.url }}
+          libraries: |
+            - source-path: ./
+            - name: WebSockets
+            - name: ArduinoJson
+              version: ^7.0.0
+          sketch-paths: ${{ matrix.board.sketches }}
+          enable-warnings-report: true
