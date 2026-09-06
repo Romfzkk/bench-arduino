@@ -61,11 +61,16 @@ lib_deps =
 `Minimal` is one sensor and one relay, and builds on ESP32 and ESP8266. Start
 there.
 
+`SelfTest` needs no wiring at all and proves the whole path works. Turn the
+Heater switch on your phone and watch the temperature climb; move the Dial and
+watch Doubled follow it. If those react, everything works in both directions.
+Use it when something is wrong and you want to know which half is broken.
+
 `Greenhouse` is four sensors, a PWM fan, a grow light and a momentary pump.
 ESP32 only, because it uses `ledcAttach`.
 
-Both are compiled against ESP32 core 3.3.7 and ESP8266 core 3.1.2 before every
-release.
+All three are compiled against ESP32 core 3.3.7 and ESP8266 core 3.1.2 before
+every release.
 
 ## Registering variables
 

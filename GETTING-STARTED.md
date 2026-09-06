@@ -118,6 +118,26 @@ working panel immediately.
 Flip the relay toggle and the onboard LED should change. That is the whole
 loop working: phone to board and back.
 
+## 10. Prove it properly
+
+If you want to be certain rather than fairly sure, flash
+**File > Examples > Bench > SelfTest** instead. It needs no wiring.
+
+Build the panel and you get a Heater switch, a Dial slider, and some read-only
+numbers. Then:
+
+- **Uptime** counts up every second. If it is frozen, nothing is arriving.
+- Turn **Heater** on. Temperature climbs from 20C to about 40C in four
+  seconds, and the chart draws the curve. That is your phone changing
+  something, the board acting on it, and the result coming back.
+- Move **Dial**. **Doubled** is always exactly twice it, calculated on the
+  board. If it follows, numeric writes work.
+- Hold **Ping**. **Presses** goes up by one.
+- The **Device Log** gets a line for every event.
+
+If all five behave, every part of the path works and anything that goes wrong
+later is in your own sketch.
+
 ## Making it yours
 
 Open the sketch again. Every variable you want on your phone gets one line in
