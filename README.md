@@ -1,8 +1,11 @@
-# Bench for Arduino
+# Bench
 
-Expose variables from an ESP32 or ESP8266 to the [Bench](https://play.google.com/store)
-mobile app. No cloud, no broker, no account. The phone opens a WebSocket
-straight to your board on your own network.
+Put your ESP32 project on your phone without wiring a screen to it.
+
+You name the variables you care about, the app reads that list and builds an
+interface out of it. Toggles, sliders, gauges, live charts. The phone talks
+straight to the board over your own WiFi, so there is no cloud account, no
+broker, and nothing that stops working when someone else's server goes down.
 
 ```cpp
 #include <WiFi.h>
@@ -30,20 +33,19 @@ void loop() {
 }
 ```
 
-That is the whole integration. The app asks the board what it exposes and
-builds the interface from the answer, so you never describe a variable twice.
+That is the whole thing. You never describe a variable twice.
+
+**New to this? Start with [GETTING-STARTED.md](GETTING-STARTED.md).** It goes
+from a bare board to a working panel in about ten minutes.
 
 ## Install
 
-Not in the Arduino Library Manager yet, so it installs from a ZIP:
+Not in the Library Manager yet, so grab
+[Bench.zip from the releases page](../../releases/latest) and use
+**Sketch > Include Library > Add .ZIP Library**.
 
-1. Download `Bench.zip` from [Releases](../../releases/latest)
-2. Arduino IDE: **Sketch** > **Include Library** > **Add .ZIP Library**
-
-Then install these two from **Manage Libraries**:
-
-- **WebSockets** by Markus Sattler
-- **ArduinoJson** v7 by Benoit Blanchon
+You also need **WebSockets** by Markus Sattler and **ArduinoJson** v7, both of
+which are in the Library Manager.
 
 PlatformIO:
 
@@ -56,91 +58,99 @@ lib_deps =
 
 ## Examples
 
-| Sketch | Boards | What it shows |
-| --- | --- | --- |
-| `Minimal` | ESP32, ESP8266 | One sensor, one relay. Start here. |
-| `Greenhouse` | ESP32 | Four sensors, PWM fan, grow light, momentary pump |
+`Minimal` is one sensor and one relay, and builds on ESP32 and ESP8266. Start
+there.
 
-Both are compiled against ESP32 core 3.3.7 and ESP8266 core 3.1.2 before
-every release.
+`Greenhouse` is four sensors, a PWM fan, a grow light and a momentary pump.
+ESP32 only, because it uses `ledcAttach`.
 
-## API
+Both are compiled against ESP32 core 3.3.7 and ESP8266 core 3.1.2 before every
+release.
 
-### Registering variables
+## Registering variables
 
-| Call | Purpose |
+```cpp
+bench.number("key", "Label", &floatVar);
+bench.number("key", "Label", &intVar);
+bench.boolean("key", "Label", &boolVar);
+```
+
+The key is what saved panels bind to. Treat it like a database column: renaming
+it breaks panels people have already built. The label is cosmetic, change it
+whenever.
+
+Options chain onto the registration:
+
+```cpp
+bench.number("fan", "Fan Speed", &fanSpeed).range(0, 255).precision(0);
+bench.number("temp", "Temperature", &temp).unit("C").range(0, 50).readOnly();
+bench.boolean("pump", "Pump", &pump).writeOnly();
+```
+
+| Option | What it does |
 | --- | --- |
-| `bench.number(key, label, &floatVar)` | Numeric channel backed by a `float` |
-| `bench.number(key, label, &intVar)` | Numeric channel backed by an `int` |
-| `bench.boolean(key, label, &boolVar)` | On/off channel backed by a `bool` |
+| `.unit("C")` | Shown beside the value |
+| `.range(lo, hi)` | Bounds gauges and sliders, and clamps writes |
+| `.precision(n)` | Decimal places |
+| `.readOnly()` | App shows it, never writes it |
+| `.writeOnly()` | App writes it, never shows it |
+| `.label("...")` | Change the label after registration |
 
-`key` is the stable identifier the app stores in saved panels. Renaming it
-breaks existing panels, so treat it like a database column. `label` is cosmetic
-and safe to change whenever.
+Direction is worth getting right. The app only offers widgets a channel can
+actually drive, so a `.readOnly()` sensor never gets a slider put on it. That
+removes the whole class of panels where a control looks live but writes into
+nothing.
 
-### Options, chained onto the registration
+## Runtime
 
-| Option | Effect |
+| Call | What it does |
 | --- | --- |
-| `.unit("C")` | Unit shown beside the value |
-| `.range(lo, hi)` | Bounds for gauges and sliders, and clamping on write |
-| `.precision(n)` | Decimal places to display |
-| `.readOnly()` | App may display it, never write it |
-| `.writeOnly()` | App may write it, never displays it |
-| `.label("...")` | Override the label after registration |
-
-Direction matters. The app only offers widgets a channel can actually drive, so
-a `.readOnly()` channel never gets a slider and a `.writeOnly()` channel never
-gets a gauge. That removes the whole class of dashboards where a control looks
-live but writes nowhere.
-
-### Runtime
-
-| Call | Purpose |
-| --- | --- |
-| `bench.begin()` | Start the server and advertise over mDNS |
-| `bench.loop()` | Pump the server and publish changes. Call every pass |
-| `bench.setHostname("rig")` | mDNS name without `.local`. Call before `begin()` |
-| `bench.log("...")` | Line in the app's terminal widget |
-| `bench.warn(...)` / `bench.error(...)` | Same, coloured by severity |
+| `bench.begin()` | Starts the server and the mDNS advert |
+| `bench.loop()` | Pumps the server and publishes changes. Every pass |
+| `bench.setHostname("rig")` | mDNS name without `.local`. Before `begin()` |
+| `bench.log(...)` | A line in the app's terminal widget |
+| `bench.warn(...)`, `bench.error(...)` | Same, coloured |
 | `bench.hasClients()` | True while a phone is connected |
-| `bench.setUpdateInterval(ms)` | Publish cadence, default 100 ms |
-| `bench.setRefreshInterval(ms)` | Full state resend, default 2000 ms |
+| `bench.setUpdateInterval(ms)` | Publish rate, default 100 |
+| `bench.setRefreshInterval(ms)` | Full resend, default 2000 |
+
+## Things that will bite you
+
+**Never call `delay()` in `loop()`.** It blocks the socket and the panel goes
+dead on the phone. Gate your sensor reads on `millis()` the way the examples
+do. This is the single most common way to break it.
+
+**Your board must be on 2.4GHz.** ESP32 and ESP8266 cannot see 5GHz networks.
+If discovery never finds anything, check this before anything else.
+
+**Registered variables have to be global.** The library stores pointers to
+them, so a local goes out of scope and you get garbage.
+
+Twenty four channels by default. Raise it with `-DBENCH_MAX_CHANNELS=48` if you
+need more.
+
+Only changed values go on the wire, plus a full resend every couple of seconds
+so a phone that reconnects catches up.
 
 ## Discovery
 
 `begin()` advertises the board as `_bench._tcp` and claims `bench.local`, so
-the app finds it without anyone typing an IP address.
+the app finds it without anyone typing an IP.
 
-Three things have to line up:
+Give each board its own name if you run several:
 
-- phone and board on the **same network**, not a guest or IoT VLAN
-- the router must not block multicast, which some mesh systems do
-- one board per hostname, so give each a distinct `setHostname()`
+```cpp
+bench.setHostname("greenhouse");   // greenhouse.local
+```
 
-When discovery is blocked the app falls back to sweeping the subnet, which
-needs no multicast. The IP printed on boot always works as a last resort.
-
-## Notes
-
-- **Never call `delay()` in `loop()`.** Gate sensor reads on `millis()` instead,
-  the way the example does. A blocking delay stalls the socket and the panel
-  goes dead.
-- Only changed values go on the wire, plus a full refresh every couple of
-  seconds so charts stay continuous after a reconnect.
-- Registered variables must be global, or otherwise outlive the sketch. The
-  library stores pointers to them.
-- Default limit is 24 channels. Raise it with `-DBENCH_MAX_CHANNELS=48`.
-- On ESP8266 the mDNS responder is pumped from `bench.loop()`. On ESP32 it runs
-  on its own task. Either way `bench.loop()` every pass is required.
-- Reflashing reboots the board. The app reconnects on its own with backoff, so
-  leave the panel open while you iterate.
+If your router blocks multicast, which some mesh systems do, the app falls back
+to scanning the subnet instead. The IP printed on boot always works as a last
+resort.
 
 ## Protocol
 
-If you would rather not use the library, the wire format is small enough to
-implement by hand. Newline-delimited JSON over a WebSocket, default port 81,
-path `/ws`.
+Newline-delimited JSON over a WebSocket, port 81, path `/ws`. Small enough to
+implement by hand if you would rather not use the library.
 
 Board to app:
 
@@ -163,9 +173,9 @@ App to board:
 ```
 
 `type` is `bool`, `number` or `text`. `mode` is `r`, `w` or `rw`. Anything the
-app cannot parse is discarded rather than treated as an error, so a partially
+app cannot parse is dropped rather than treated as an error, so a half
 implemented board still works.
 
 ## Licence
 
-MIT. See [LICENSE](LICENSE).
+MIT, see [LICENSE](LICENSE).
