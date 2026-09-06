@@ -55,7 +55,9 @@ void setup() {
   Serial.print("IP: ");
   Serial.println(WiFi.localIP());
 
-  bench.setHostname("selftest");
+  // Left on the default bench.local on purpose. A custom hostname is invisible
+  // to the app's hostname probe unless it happens to be on its list, and this
+  // example exists to be found.
 
   bench.number("temp", "Temperature", &temperature).unit("C").range(15, 60).precision(1).readOnly();
   bench.number("uptime", "Uptime", &uptime).unit("s").readOnly();
